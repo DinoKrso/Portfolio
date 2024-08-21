@@ -58,7 +58,7 @@ export const Banner = () => {
                 <h1>{`Hi! I'm Dino`} <span className="txt-rotate" dataPeriod="1000" data-rotate='["Web Engineer", "Back-End Engineer", "Software Engineer" ]'><span className="wrap">{text}</span></span></h1>
                 <p>
   I am a dedicated final-year IT student at International Burch University, majoring in Information Technology with a focus on programming and software development. My studies have provided me with a solid foundation in computer science, programming, and software engineering. I am eager to apply my skills in a dynamic team, where I can continue to grow and contribute to innovative projects as a software developer. 
-  <a href="../assets/img/DinoKrsoCV.pdf" download="DinoKrsoCV.pdf">Download my CV</a>
+  <a href="https://drive.google.com/file/d/1UZvs6yvKyCMDuydQmwB7Yff680gs8hIa/view?usp=drive_link">Download my CV</a>
 </p>
                   <button onClick={() => console.log('connect')}>Let’s Connect <ArrowRightCircle size={25} /></button>
               </div>}
