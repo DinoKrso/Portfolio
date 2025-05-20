@@ -22,7 +22,7 @@ export const Contact = () => {
                   <h2>Get In Touch</h2>
                   <div className="contact-info">
                     <p><strong>Email:</strong> <a href="mailto:dino.krso02@gmail.com">dino.krso02@gmail.com</a></p>
-                    <p><strong>Phone:</strong> <a href="tel:+387603400423">+387 60 340 0423</a></p>
+                  
                   </div>
                 </div>}
             </TrackVisibility>
