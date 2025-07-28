@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, useScroll, useTransform } from "framer-motion"
-import { Mail, Phone, Github, Linkedin, Code, Terminal, Database, Hand } from "lucide-react"
+import { Mail, Phone, Github, Linkedin, Code, Terminal, Database, Hand, Download, FileText } from "lucide-react"
 import Spline from "@splinetool/react-spline";
 import { Card, CardContent } from "@/components/ui/card"
 import { useState, useRef, useEffect } from "react"
@@ -14,12 +14,17 @@ export default function Portfolio() {
   const [holdTimer, setHoldTimer] = useState<NodeJS.Timeout | null>(null)
   const [hasCompletedHold, setHasCompletedHold] = useState(false)
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null)
+  const [isDownloading, setIsDownloading] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   
   // Add scroll progress tracking
   const { scrollYProgress } = useScroll()
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
   const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8])
+  
+  // Track scroll direction for animations
+  const [scrollDirection, setScrollDirection] = useState<'down' | 'up'>('down')
+  const [lastScrollY, setLastScrollY] = useState(0)
   
   // Check mobile and set initial states
   useEffect(() => {
@@ -33,6 +38,48 @@ export default function Portfolio() {
 
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
+
+  // Track scroll direction
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+      if (currentScrollY > lastScrollY) {
+        setScrollDirection('down')
+      } else {
+        setScrollDirection('up')
+      }
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [lastScrollY])
+
+  // Handle CV download
+  const handleCVDownload = async () => {
+    setIsDownloading(true)
+    try {
+      const response = await fetch('/api/download-cv')
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'Dino_Krso_CV.pdf'
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      } else {
+        // Fallback to direct link
+        window.open('https://drive.google.com/file/d/10FGYKaOASoCKYoUyLE7sWnKS9NrlTAIR/view?usp=drive_link', '_blank')
+      }
+    } catch (error) {
+      // Fallback to direct link
+      window.open('https://drive.google.com/file/d/10FGYKaOASoCKYoUyLE7sWnKS9NrlTAIR/view?usp=drive_link', '_blank')
+    }
+    setIsDownloading(false)
+  }
 
   // Handle click-and-hold functionality
   const handleMouseDown = () => {
@@ -508,7 +555,7 @@ export default function Portfolio() {
       {/* Experience Section */}
       <motion.section
         id="experience"
-        className="min-h-screen py-20 px-4 md:px-8 relative z-10"
+        className="min-h-screen py-8 px-4 md:px-8 relative z-10"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -516,11 +563,12 @@ export default function Portfolio() {
       >
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.h2
-            className="text-5xl md:text-6xl font-bold text-center mb-16 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+            className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
             initial={{ y: 100, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
             viewport={{ once: false, amount: 0.3 }}
+            animate={scrollDirection === 'down' ? { y: 0, opacity: 1 } : { y: 100, opacity: 0 }}
           >
             Experience
           </motion.h2>
@@ -535,16 +583,21 @@ export default function Portfolio() {
                   key={index}
                   initial={{ y: 100, opacity: 0, rotateX: 45 }}
                   whileInView={{ y: 0, opacity: 1, rotateX: 0 }}
+                  viewport={{ once: false, amount: 0.3 }}
+                  className="group h-full relative"
+                  onHoverStart={() => setHoveredCardIndex(index)}
+                  onHoverEnd={() => setHoveredCardIndex(null)}
+                  animate={{
+                    y: 0,
+                    opacity: 1,
+                    rotateX: 0,
+                  }}
                   transition={{
                     delay: 0.5 + index * 0.2,
                     duration: 0.8,
                     type: "spring",
                     stiffness: 100,
                   }}
-                  viewport={{ once: false, amount: 0.3 }}
-                  className="group h-full"
-                  onHoverStart={() => setHoveredCardIndex(index)}
-                  onHoverEnd={() => setHoveredCardIndex(null)}
                 >
                   {exp.link ? (
                     <a 
@@ -553,7 +606,15 @@ export default function Portfolio() {
                       rel="noopener noreferrer"
                       className="block h-full"
                     >
-                      <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden hover:border-[#FBAA84]/50 transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-[#FBAA84]/20 h-full flex flex-col">
+                      <motion.div
+                        animate={{
+                          scale: isHovered ? 1.05 : isOtherHovered ? 0.95 : 1,
+                          zIndex: isHovered ? 10 : 1,
+                        }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                        className="h-full"
+                      >
+                        <Card className={`bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden hover:border-[#FBAA84]/50 transition-all duration-500 h-full flex flex-col ${isHovered ? 'shadow-2xl shadow-[#FBAA84]/30' : 'group-hover:shadow-2xl group-hover:shadow-[#FBAA84]/20'}`}>
                         <motion.div 
                           className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0"
                           animate={{
@@ -588,11 +649,12 @@ export default function Portfolio() {
                           <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            className="group-hover:translate-y-[-4px] transition-transform duration-300 flex-1 flex flex-col"
+                            className="flex-1 flex flex-col"
                             viewport={{ once: false }}
                             animate={{
                               opacity: isOtherHovered ? 0.3 : 1,
                               scale: isOtherHovered ? 0.95 : 1,
+                              y: isHovered ? -8 : 0,
                             }}
                             transition={{ 
                               delay: 0.7 + index * 0.1,
@@ -616,11 +678,20 @@ export default function Portfolio() {
                           </motion.div>
                         </CardContent>
                       </Card>
+                      </motion.div>
                     </a>
                   ) : (
-                    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden hover:border-[#FBAA84]/50 transition-all duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-[#FBAA84]/20 h-full flex flex-col">
-                      <motion.div 
-                        className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0"
+                    <motion.div
+                      animate={{
+                        scale: isHovered ? 1.05 : isOtherHovered ? 0.95 : 1,
+                        zIndex: isHovered ? 10 : 1,
+                      }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className="h-full"
+                    >
+                      <Card className={`bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden hover:border-[#FBAA84]/50 transition-all duration-500 h-full flex flex-col ${isHovered ? 'shadow-2xl shadow-[#FBAA84]/30' : 'group-hover:shadow-2xl group-hover:shadow-[#FBAA84]/20'}`}>
+                        <motion.div 
+                          className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0"
                         animate={{
                           height: isHovered ? 280 : 192,
                           scale: isHovered ? 1.05 : 1,
@@ -653,11 +724,11 @@ export default function Portfolio() {
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           whileInView={{ opacity: 1, y: 0 }}
-                          className="group-hover:translate-y-[-4px] transition-transform duration-300 flex-1 flex flex-col"
+                          className="flex-1 flex flex-col"
                           viewport={{ once: false }}
                           animate={{
                             opacity: isOtherHovered ? 0.3 : 1,
-                            scale: isOtherHovered ? 0.95 : 1,
+                            y: isHovered ? -8 : 0,
                           }}
                           transition={{ 
                             delay: 0.7 + index * 0.1,
@@ -681,6 +752,7 @@ export default function Portfolio() {
                         </motion.div>
                       </CardContent>
                     </Card>
+                    </motion.div>
                   )}
                 </motion.div>
               )
@@ -691,7 +763,7 @@ export default function Portfolio() {
 
       {/* Tech Stack Section */}
       <motion.section
-        className="min-h-screen py-20 px-4 md:px-8 relative z-10 overflow-hidden"
+        className="py-8 px-4 md:px-8 relative z-10 overflow-hidden"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -699,16 +771,17 @@ export default function Portfolio() {
       >
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.h2
-            className="text-5xl md:text-6xl font-bold text-center mb-16 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+            className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
             initial={{ y: 100, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
             viewport={{ once: false, amount: 0.3 }}
+            animate={scrollDirection === 'down' ? { y: 0, opacity: 1 } : { y: 100, opacity: 0 }}
           >
             Tech Stack
           </motion.h2>
 
-          <div className="relative min-h-[800px] flex items-center justify-center">
+          <div className="relative min-h-[600px] flex items-center justify-center">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 md:gap-16 lg:gap-20 max-w-7xl mx-auto px-8">
               {techStack && techStack.length > 0 && techStack.map((tech, index) => {
                 // Create unique floating patterns for each bubble
@@ -730,9 +803,10 @@ export default function Portfolio() {
                     initial={{ scale: 0, opacity: 0, y: 30 }}
                     whileInView={{ scale: 1, opacity: 1, y: 0 }}
                     animate={{
-                      y: floatPatterns[index]?.y || [0, 0, 0],
+                      y: scrollDirection === 'down' ? floatPatterns[index]?.y || [0, 0, 0] : 30,
+                      opacity: scrollDirection === 'down' ? 1 : 0,
+                      scale: scrollDirection === 'down' ? [1, 1.03, 1] : 0,
                       x: floatPatterns[index]?.x || [0, 0, 0],
-                      scale: [1, 1.03, 1],
                     }}
                     transition={{
                       delay: 0.2 + index * 0.1,
@@ -807,7 +881,7 @@ export default function Portfolio() {
 
       {/* Contact Section */}
       <motion.section
-        className="min-h-screen py-20 px-4 md:px-8 flex items-center relative z-10"
+        className="min-h-screen py-8 px-4 md:px-8 flex items-center relative z-10"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -815,11 +889,12 @@ export default function Portfolio() {
       >
         <div className="max-w-4xl mx-auto w-full relative z-10">
           <motion.h2
-            className="text-5xl md:text-6xl font-bold text-center mb-16 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+            className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
             initial={{ y: 100, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
             viewport={{ once: false, amount: 0.3 }}
+            animate={scrollDirection === 'down' ? { y: 0, opacity: 1 } : { y: 100, opacity: 0 }}
           >
             Let's Connect
           </motion.h2>
@@ -830,6 +905,7 @@ export default function Portfolio() {
               whileInView={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.8 }}
               viewport={{ once: false, amount: 0.3 }}
+              animate={scrollDirection === 'down' ? { x: 0, opacity: 1 } : { x: -100, opacity: 0 }}
             >
               <h3 className="text-3xl font-bold mb-8 text-white">Get In Touch</h3>
               <div className="space-y-6">
@@ -859,6 +935,7 @@ export default function Portfolio() {
               transition={{ delay: 0.7, duration: 0.8 }}
               viewport={{ once: false, amount: 0.3 }}
               className="flex flex-col space-y-4"
+              animate={scrollDirection === 'down' ? { x: 0, opacity: 1 } : { x: 100, opacity: 0 }}
             >
               <motion.a
                 href="https://github.com/DinoKrso"
@@ -892,6 +969,7 @@ export default function Portfolio() {
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.8 }}
             viewport={{ once: false, amount: 0.3 }}
+            animate={scrollDirection === 'down' ? { y: 0, opacity: 1 } : { y: 50, opacity: 0 }}
           >
             <p className="text-gray-400 text-lg">
               Ready to bring your ideas to life? Let's build something amazing together.
@@ -900,6 +978,77 @@ export default function Portfolio() {
         </div>
       </motion.section>
       </div>
+
+      {/* Floating CV Download Button */}
+      <motion.div
+        className="fixed bottom-8 right-8 z-50"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 2, duration: 0.5, type: "spring" }}
+      >
+        <motion.button
+          onClick={handleCVDownload}
+          disabled={isDownloading}
+          className="relative group"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          {/* Pulsing background */}
+          <motion.div
+            className="absolute inset-0 bg-[#FBAA84]/20 rounded-full blur-md"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          
+          {/* Main button */}
+          <div className="relative bg-gradient-to-br from-[#FBAA84] to-[#FBAA84]/80 rounded-full p-4 shadow-2xl shadow-[#FBAA84]/30 border border-[#FBAA84]/50 backdrop-blur-sm">
+            {/* Download icon */}
+            <motion.div
+              animate={{
+                y: isDownloading ? [0, -2, 0] : 0,
+                rotate: isDownloading ? [0, 5, -5, 0] : 0,
+              }}
+              transition={{
+                duration: 0.6,
+                repeat: isDownloading ? Infinity : 0,
+                ease: "easeInOut",
+              }}
+              className="flex flex-col items-center"
+            >
+              {isDownloading ? (
+                <FileText className="w-6 h-6 text-white mb-1" />
+              ) : (
+                <Download className="w-6 h-6 text-white mb-1" />
+              )}
+              <span className="text-white text-xs font-bold tracking-wider">CV</span>
+            </motion.div>
+            
+            {/* Hover tooltip */}
+            <motion.div
+              className="absolute right-full mr-4 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap opacity-0 pointer-events-none"
+              animate={{
+                opacity: 0,
+                x: 10,
+              }}
+              whileHover={{
+                opacity: 1,
+                x: 0,
+              }}
+              transition={{ duration: 0.2 }}
+            >
+              Download CV
+              <div className="absolute left-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 border-t-4 border-t-transparent border-b-4 border-b-transparent" />
+            </motion.div>
+          </div>
+        </motion.button>
+      </motion.div>
     </div>
   )
 }
