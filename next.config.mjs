@@ -9,6 +9,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  output: 'export',
+  trailingSlash: true,
+  basePath: '/Portfolio', // 🔁 CHANGE THIS to your repo name
+};
 
-export default nextConfig
+export default nextConfig;
