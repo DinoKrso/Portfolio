@@ -197,7 +197,7 @@ export default function Portfolio() {
       company: "Xtream Networks",
       image: "/xtream.png",
       technologies: ["Frontend Development", "SEO", "Performance Optimization"],
-      description: "Implemented front-end design and integrated dynamic features for improved functionality, optimized site for speed, performance, and SEO to enhance online presence",
+      description: "Implemented front-end design and integrated dynamic features for improved functionality and optimized site performance.",
       link: "https://xtream.ba/",
     },
     {
@@ -635,17 +635,17 @@ export default function Portfolio() {
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
                           <motion.div 
-                            className="absolute bottom-4 left-4"
+                            className="absolute bottom-6 left-6 right-6"
                             animate={{
-                              y: isHovered ? -10 : 0,
+                              y: isHovered ? -8 : 0,
                             }}
                             transition={{ duration: 0.4, ease: "easeOut" }}
                           >
-                            <h3 className="text-xl font-bold text-white">{exp.title}</h3>
+                            <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
                             <p className="text-gray-300">{exp.company}</p>
                           </motion.div>
                         </motion.div>
-                        <CardContent className="p-6 flex-1 flex flex-col">
+                        <CardContent className="px-6 pb-6 pt-4 flex-1 flex flex-col">
                           <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -657,7 +657,6 @@ export default function Portfolio() {
                               y: isHovered ? -8 : 0,
                             }}
                             transition={{ 
-                              delay: 0.7 + index * 0.1,
                               duration: 0.4, 
                               ease: "easeOut" 
                             }}
@@ -710,17 +709,17 @@ export default function Portfolio() {
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
                         <motion.div 
-                          className="absolute bottom-4 left-4"
+                          className="absolute bottom-6 left-6 right-6"
                           animate={{
-                            y: isHovered ? -10 : 0,
+                            y: isHovered ? -8 : 0,
                           }}
                           transition={{ duration: 0.4, ease: "easeOut" }}
                         >
-                          <h3 className="text-xl font-bold text-white">{exp.title}</h3>
+                          <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
                           <p className="text-gray-300">{exp.company}</p>
                         </motion.div>
                       </motion.div>
-                      <CardContent className="p-6 flex-1 flex flex-col">
+                      <CardContent className="px-6 pb-6 pt-4 flex-1 flex flex-col">
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           whileInView={{ opacity: 1, y: 0 }}
@@ -731,7 +730,6 @@ export default function Portfolio() {
                             y: isHovered ? -8 : 0,
                           }}
                           transition={{ 
-                            delay: 0.7 + index * 0.1,
                             duration: 0.4, 
                             ease: "easeOut" 
                           }}
@@ -878,6 +876,8 @@ export default function Portfolio() {
           </div>
         </div>
       </motion.section>
+
+
 
       {/* Contact Section */}
       <motion.section
