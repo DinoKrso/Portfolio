@@ -59,22 +59,36 @@ export default function Portfolio() {
   const handleCVDownload = async () => {
     setIsDownloading(true)
     try {
+      // For mobile devices, directly open the Google Drive link
+      if (isMobile) {
+        window.open('https://drive.google.com/file/d/10FGYKaOASoCKYoUyLE7sWnKS9NrlTAIR/view?usp=drive_link', '_blank')
+        setIsDownloading(false)
+        return
+      }
+
+      // For desktop, try the API route first
       const response = await fetch('/api/download-cv')
       if (response.ok) {
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'Dino_Krso_CV.pdf'
-        document.body.appendChild(a)
-        a.click()
-        window.URL.revokeObjectURL(url)
-        document.body.removeChild(a)
+        // If it's a redirect response, follow it
+        if (response.redirected) {
+          window.open(response.url, '_blank')
+        } else {
+          const blob = await response.blob()
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'Dino_Krso_CV.pdf'
+          document.body.appendChild(a)
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+        }
       } else {
         // Fallback to direct link
         window.open('https://drive.google.com/file/d/10FGYKaOASoCKYoUyLE7sWnKS9NrlTAIR/view?usp=drive_link', '_blank')
       }
     } catch (error) {
+      console.error('CV download error:', error)
       // Fallback to direct link
       window.open('https://drive.google.com/file/d/10FGYKaOASoCKYoUyLE7sWnKS9NrlTAIR/view?usp=drive_link', '_blank')
     }
@@ -988,8 +1002,17 @@ export default function Portfolio() {
       >
         <motion.button
           onClick={handleCVDownload}
+          onTouchStart={(e) => {
+            // Prevent default to avoid double-tap zoom on mobile
+            e.preventDefault()
+          }}
+          onTouchEnd={(e) => {
+            // Handle touch end for mobile
+            e.preventDefault()
+            handleCVDownload()
+          }}
           disabled={isDownloading}
-          className="relative group"
+          className="relative group touch-manipulation"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
