@@ -6,6 +6,7 @@ import Spline from "@splinetool/react-spline";
 import { Card, CardContent } from "@/components/ui/card"
 import { useState, useRef, useEffect } from "react"
 import AnimatedBackground from "@/components/AnimatedBackground"
+import { GlassCard } from "@/components/GlassCard"
 
 export default function Portfolio() {
   const [isMobile, setIsMobile] = useState(false)
@@ -397,9 +398,14 @@ export default function Portfolio() {
                 scale: [1, 1.1, 1]
               }}
               transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: 0 }}
-              className="p-3 rounded-full bg-[#FBAA84]/10 border border-[#FBAA84]/30"
             >
-              <Terminal className="w-7 h-7 text-[#FBAA84]" />
+              <GlassCard
+                variant="floating"
+                intensity="medium"
+                className="p-3"
+              >
+                <Terminal className="w-7 h-7 text-[#FBAA84]" />
+              </GlassCard>
             </motion.div>
             <motion.div
               animate={{ 
@@ -407,9 +413,14 @@ export default function Portfolio() {
                 scale: [1, 1.1, 1]
               }}
               transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: 0.5 }}
-              className="p-3 rounded-full bg-gray-800/50 border border-gray-600/30"
             >
-              <Database className="w-7 h-7 text-gray-400" />
+              <GlassCard
+                variant="floating"
+                intensity="subtle"
+                className="p-3"
+              >
+                <Database className="w-7 h-7 text-gray-400" />
+              </GlassCard>
             </motion.div>
             <motion.div
               animate={{ 
@@ -417,9 +428,14 @@ export default function Portfolio() {
                 scale: [1, 1.1, 1]
               }}
               transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: 1 }}
-              className="p-3 rounded-full bg-[#FBAA84]/10 border border-[#FBAA84]/30"
             >
-              <Code className="w-7 h-7 text-[#FBAA84]" />
+              <GlassCard
+                variant="floating"
+                intensity="medium"
+                className="p-3"
+              >
+                <Code className="w-7 h-7 text-[#FBAA84]" />
+              </GlassCard>
             </motion.div>
           </div>
         </motion.div>
@@ -628,69 +644,73 @@ export default function Portfolio() {
                         transition={{ duration: 0.3, ease: "easeOut" }}
                         className="h-full"
                       >
-                        <Card className={`bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden hover:border-[#FBAA84]/50 transition-all duration-500 h-full flex flex-col ${isHovered ? 'shadow-2xl shadow-[#FBAA84]/30' : 'group-hover:shadow-2xl group-hover:shadow-[#FBAA84]/20'}`}>
-                        <motion.div 
-                          className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0"
-                          animate={{
-                            height: isHovered ? 280 : 192,
-                            scale: isHovered ? 1.05 : 1,
-                          }}
-                          transition={{ duration: 0.4, ease: "easeOut" }}
+                        <GlassCard 
+                          variant="card" 
+                          intensity="medium"
+                          className="h-full flex flex-col overflow-hidden"
                         >
-                          <motion.img
-                            src={exp.image}
-                            alt={exp.company}
-                            className="w-full h-full object-cover"
-                            animate={{
-                              opacity: isHovered ? 0.9 : 0.6,
-                              scale: isHovered ? 1.1 : 1,
-                            }}
-                            transition={{ duration: 0.4, ease: "easeOut" }}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
                           <motion.div 
-                            className="absolute bottom-6 left-6 right-6"
+                            className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0"
                             animate={{
-                              y: isHovered ? -8 : 0,
+                              height: isHovered ? 280 : 192,
+                              scale: isHovered ? 1.05 : 1,
                             }}
                             transition={{ duration: 0.4, ease: "easeOut" }}
                           >
-                            <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
-                            <p className="text-gray-300">{exp.company}</p>
+                            <motion.img
+                              src={exp.image}
+                              alt={exp.company}
+                              className="w-full h-full object-cover"
+                              animate={{
+                                opacity: isHovered ? 0.9 : 0.6,
+                                scale: isHovered ? 1.1 : 1,
+                              }}
+                              transition={{ duration: 0.4, ease: "easeOut" }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
+                            <motion.div 
+                              className="absolute bottom-6 left-6 right-6"
+                              animate={{
+                                y: isHovered ? -8 : 0,
+                              }}
+                              transition={{ duration: 0.4, ease: "easeOut" }}
+                            >
+                              <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
+                              <p className="text-gray-300">{exp.company}</p>
+                            </motion.div>
                           </motion.div>
-                        </motion.div>
-                        <CardContent className="px-6 pb-6 pt-4 flex-1 flex flex-col">
-                          <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            className="flex-1 flex flex-col"
-                            viewport={{ once: false }}
-                            animate={{
-                              opacity: isOtherHovered ? 0.3 : 1,
-                              scale: isOtherHovered ? 0.95 : 1,
-                              y: isHovered ? -8 : 0,
-                            }}
-                            transition={{ 
-                              duration: 0.4, 
-                              ease: "easeOut" 
-                            }}
-                          >
-                            <p className="text-gray-400 mb-4 group-hover:text-gray-300 transition-colors duration-300 flex-1">
-                              {exp.description}
-                            </p>
-                            <div className="flex flex-wrap gap-2 mt-auto">
-                              {exp.technologies.map((tech, techIndex) => (
-                                <span
-                                  key={techIndex}
-                                  className="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-sm group-hover:bg-[#FBAA84]/25 group-hover:text-[#FBAA84] transition-colors duration-300"
-                                >
-                                  {tech}
-                                </span>
-                              ))}
-                            </div>
-                          </motion.div>
-                        </CardContent>
-                      </Card>
+                          <div className="px-6 pb-6 pt-4 flex-1 flex flex-col">
+                            <motion.div
+                              initial={{ opacity: 0, y: 20 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              className="flex-1 flex flex-col"
+                              viewport={{ once: false }}
+                              animate={{
+                                opacity: isOtherHovered ? 0.3 : 1,
+                                scale: isOtherHovered ? 0.95 : 1,
+                                y: isHovered ? -8 : 0,
+                              }}
+                              transition={{ 
+                                duration: 0.4, 
+                                ease: "easeOut" 
+                              }}
+                            >
+                              <p className="text-gray-400 mb-4 group-hover:text-gray-300 transition-colors duration-300 flex-1">
+                                {exp.description}
+                              </p>
+                              <div className="flex flex-wrap gap-2 mt-auto">
+                                {exp.technologies.map((tech, techIndex) => (
+                                  <span
+                                    key={techIndex}
+                                    className="px-3 py-1 bg-gray-800/50 text-gray-300 rounded-full text-sm group-hover:bg-[#FBAA84]/25 group-hover:text-[#FBAA84] transition-colors duration-300 backdrop-blur-sm"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+                              </div>
+                            </motion.div>
+                          </div>
+                        </GlassCard>
                       </motion.div>
                     </a>
                   ) : (
@@ -702,7 +722,11 @@ export default function Portfolio() {
                       transition={{ duration: 0.3, ease: "easeOut" }}
                       className="h-full"
                     >
-                      <Card className={`bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden hover:border-[#FBAA84]/50 transition-all duration-500 h-full flex flex-col ${isHovered ? 'shadow-2xl shadow-[#FBAA84]/30' : 'group-hover:shadow-2xl group-hover:shadow-[#FBAA84]/20'}`}>
+                      <GlassCard 
+                        variant="card" 
+                        intensity="medium"
+                        className="h-full flex flex-col overflow-hidden"
+                      >
                         <motion.div 
                           className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0"
                         animate={{
@@ -733,7 +757,7 @@ export default function Portfolio() {
                           <p className="text-gray-300">{exp.company}</p>
                         </motion.div>
                       </motion.div>
-                      <CardContent className="px-6 pb-6 pt-4 flex-1 flex flex-col">
+                      <div className="px-6 pb-6 pt-4 flex-1 flex flex-col">
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           whileInView={{ opacity: 1, y: 0 }}
@@ -755,15 +779,15 @@ export default function Portfolio() {
                             {exp.technologies.map((tech, techIndex) => (
                               <span
                                 key={techIndex}
-                                className="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-sm group-hover:bg-[#FBAA84]/25 group-hover:text-[#FBAA84] transition-colors duration-300"
+                                className="px-3 py-1 bg-gray-800/50 text-gray-300 rounded-full text-sm group-hover:bg-[#FBAA84]/25 group-hover:text-[#FBAA84] transition-colors duration-300 backdrop-blur-sm"
                               >
                                 {tech}
                               </span>
                             ))}
                           </div>
                         </motion.div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </GlassCard>
                     </motion.div>
                   )}
                 </motion.div>
@@ -858,31 +882,30 @@ export default function Portfolio() {
                       }
                     }}
                   >
-                    <div className="relative p-8 rounded-3xl backdrop-blur-sm border border-gray-700/50 bg-gradient-to-br from-gray-800/60 to-gray-900/60 group-hover:from-gray-700/70 group-hover:to-gray-800/70 transition-all duration-300 shadow-xl group-hover:shadow-2xl group-hover:shadow-[#FBAA84]/20 w-40 h-40 flex flex-col items-center justify-center">
-                      {/* Bubble glow effects */}
-                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#FBAA84]/10 to-transparent opacity-60 animate-pulse" />
-                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-tl from-[#FBAA84]/5 to-transparent opacity-40" />
-                      
-                      {/* Tech logo */}
-                      <div className="relative z-10 mb-3">
-                        <img 
-                          src={tech?.logo || ''} 
-                          alt={tech?.name || 'Tech'}
-                          className="w-16 h-16 group-hover:scale-110 transition-transform duration-300"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none'
-                          }}
-                        />
+                    <GlassCard 
+                      variant="floating" 
+                      intensity="medium"
+                      className="w-40 h-40"
+                    >
+                      <div className="w-full h-full flex flex-col items-center justify-center">
+                        {/* Tech logo */}
+                        <div className="mb-3">
+                          <img 
+                            src={tech?.logo || ''} 
+                            alt={tech?.name || 'Tech'}
+                            className="w-16 h-16 group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none'
+                            }}
+                          />
+                        </div>
+                        
+                        {/* Tech name */}
+                        <p className="text-base font-medium text-gray-300 group-hover:text-white transition-colors duration-300 text-center">
+                          {tech?.name || 'Tech'}
+                        </p>
                       </div>
-                      
-                      {/* Tech name */}
-                      <p className="text-base font-medium text-gray-300 group-hover:text-white transition-colors duration-300 text-center">
-                        {tech?.name || 'Tech'}
-                      </p>
-                      
-                      {/* Hover glow */}
-                      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-[#FBAA84]/20 to-[#FBAA84]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
+                    </GlassCard>
                   </motion.div>
                 );
               })}
@@ -951,29 +974,41 @@ export default function Portfolio() {
               className="flex flex-col space-y-4"
               animate={scrollDirection === 'down' ? { x: 0, opacity: 1 } : { x: 100, opacity: 0 }}
             >
-              <motion.a
-                href="https://github.com/DinoKrso"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center space-x-3 bg-gray-800 hover:bg-gray-700 p-4 rounded-lg transition-colors group"
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full"
               >
-                <Github className="group-hover:text-[#FBAA84] transition-colors" size={24} />
-                <span className="text-lg font-medium">GitHub</span>
-              </motion.a>
+                <GlassCard
+                  variant="button"
+                  intensity="medium"
+                  onClick={() => window.open('https://github.com/DinoKrso', '_blank')}
+                  className="w-full"
+                >
+                  <div className="flex items-center justify-center space-x-3">
+                    <Github className="text-white transition-colors" size={24} />
+                    <span className="text-lg font-medium text-white">GitHub</span>
+                  </div>
+                </GlassCard>
+              </motion.div>
 
-              <motion.a
-                href="https://www.linkedin.com/in/dino-kr%C5%A1o-5ba153200/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center space-x-3 bg-[#FBAA84] hover:bg-[#FBAA84]/80 text-black p-4 rounded-lg transition-colors group"
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="w-full"
               >
-                <Linkedin className="group-hover:text-black/80 transition-colors" size={24} />
-                <span className="text-lg font-medium">LinkedIn</span>
-              </motion.a>
+                <GlassCard
+                  variant="button"
+                  intensity="strong"
+                  onClick={() => window.open('https://www.linkedin.com/in/dino-kr%C5%A1o-5ba153200/', '_blank')}
+                  className="w-full"
+                >
+                  <div className="flex items-center justify-center space-x-3">
+                    <Linkedin className="text-white transition-colors" size={24} />
+                    <span className="text-lg font-medium text-white">LinkedIn</span>
+                  </div>
+                </GlassCard>
+              </motion.div>
             </motion.div>
           </div>
 
@@ -1000,38 +1035,16 @@ export default function Portfolio() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 2, duration: 0.5, type: "spring" }}
       >
-        <motion.button
-          onClick={handleCVDownload}
-          onTouchStart={(e) => {
-            // Prevent default to avoid double-tap zoom on mobile
-            e.preventDefault()
-          }}
-          onTouchEnd={(e) => {
-            // Handle touch end for mobile
-            e.preventDefault()
-            handleCVDownload()
-          }}
-          disabled={isDownloading}
-          className="relative group touch-manipulation"
+        <motion.div
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
         >
-          {/* Pulsing background */}
-          <motion.div
-            className="absolute inset-0 bg-[#FBAA84]/20 rounded-full blur-md"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.5, 0.8, 0.5],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          
-          {/* Main button */}
-          <div className="relative bg-gradient-to-br from-[#FBAA84] to-[#FBAA84]/80 rounded-full p-4 shadow-2xl shadow-[#FBAA84]/30 border border-[#FBAA84]/50 backdrop-blur-sm">
+          <GlassCard
+            variant="floating"
+            intensity="strong"
+            onClick={handleCVDownload}
+            className="relative group touch-manipulation"
+          >
             {/* Download icon */}
             <motion.div
               animate={{
@@ -1069,8 +1082,8 @@ export default function Portfolio() {
               Download CV
               <div className="absolute left-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-l-4 border-l-gray-900 border-t-4 border-t-transparent border-b-4 border-b-transparent" />
             </motion.div>
-          </div>
-        </motion.button>
+          </GlassCard>
+        </motion.div>
       </motion.div>
     </div>
   )
