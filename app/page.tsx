@@ -216,6 +216,13 @@ export default function Portfolio() {
       link: "https://xtream.ba/",
     },
     {
+      title: "Web Developer",
+      company: "Si-Team Ug",
+      image: "/siteam.png",
+      technologies: ["Web Development", "Cleaning Services", "Business Solutions"],
+      description: "Developed a professional website for cleaning services company, showcasing their services and improving online presence",
+    },
+    {
       title: "Personal Project",
       company: "Junior Job Platform",
       image: "/prviposao.png",
