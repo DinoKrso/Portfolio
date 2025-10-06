@@ -52,14 +52,14 @@ export function GlassCard({
   }
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!elementRef.current) return
+    if (!elementRef.current || !isHovering) return
 
     const rect = elementRef.current.getBoundingClientRect()
     setCursorPos({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
     })
-  }, [])
+  }, [isHovering])
 
   return (
     <div

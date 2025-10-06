@@ -3,8 +3,7 @@
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Mail, Phone, Github, Linkedin, Code, Terminal, Database, Hand, Download, FileText } from "lucide-react"
 import Spline from "@splinetool/react-spline";
-import { Card, CardContent } from "@/components/ui/card"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import AnimatedBackground from "@/components/AnimatedBackground"
 import { GlassCard } from "@/components/GlassCard"
 
@@ -18,14 +17,10 @@ export default function Portfolio() {
   const [isDownloading, setIsDownloading] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   
-  // Add scroll progress tracking
+  // Simplified scroll progress tracking
   const { scrollYProgress } = useScroll()
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
-  const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8])
-  
-  // Track scroll direction for animations
-  const [scrollDirection, setScrollDirection] = useState<'down' | 'up'>('down')
-  const [lastScrollY, setLastScrollY] = useState(0)
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0])
+  const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.9])
   
   // Check mobile and set initial states
   useEffect(() => {
@@ -40,29 +35,13 @@ export default function Portfolio() {
     return () => window.removeEventListener("resize", checkMobile)
   }, [])
 
-  // Track scroll direction
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      if (currentScrollY > lastScrollY) {
-        setScrollDirection('down')
-      } else {
-        setScrollDirection('up')
-      }
-      setLastScrollY(currentScrollY)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastScrollY])
-
-  // Handle CV download
-  const handleCVDownload = async () => {
+  // Handle CV download with useCallback for performance
+  const handleCVDownload = useCallback(async () => {
     setIsDownloading(true)
     try {
       // For mobile devices, directly open the Google Drive link
       if (isMobile) {
-        window.open('https://drive.google.com/file/d/10FGYKaOASoCKYoUyLE7sWnKS9NrlTAIR/view?usp=drive_link', '_blank')
+        window.open('https://drive.google.com/file/d/1jgJMpm1XTVGWZrxIrdeO_SesqrKKiyt5/view?usp=sharing', '_blank')
         setIsDownloading(false)
         return
       }
@@ -86,18 +65,18 @@ export default function Portfolio() {
         }
       } else {
         // Fallback to direct link
-        window.open('https://drive.google.com/file/d/10FGYKaOASoCKYoUyLE7sWnKS9NrlTAIR/view?usp=drive_link', '_blank')
+        window.open('https://drive.google.com/file/d/1jgJMpm1XTVGWZrxIrdeO_SesqrKKiyt5/view?usp=sharing', '_blank')
       }
     } catch (error) {
       console.error('CV download error:', error)
       // Fallback to direct link
-      window.open('https://drive.google.com/file/d/10FGYKaOASoCKYoUyLE7sWnKS9NrlTAIR/view?usp=drive_link', '_blank')
+      window.open('https://drive.google.com/file/d/1jgJMpm1XTVGWZrxIrdeO_SesqrKKiyt5/view?usp=sharing', '_blank')
     }
     setIsDownloading(false)
-  }
+  }, [isMobile])
 
-  // Handle click-and-hold functionality
-  const handleMouseDown = () => {
+  // Handle click-and-hold functionality with useCallback
+  const handleMouseDown = useCallback(() => {
     if (isMobile) return // Disable on mobile
     
     setIsHolding(true)
@@ -111,9 +90,9 @@ export default function Portfolio() {
     }, 2000) // 2 seconds
     
     setHoldTimer(timer)
-  }
+  }, [isMobile])
 
-  const handleMouseUp = () => {
+  const handleMouseUp = useCallback(() => {
     if (isMobile) return // Disable on mobile
     
     setIsHolding(false)
@@ -121,7 +100,7 @@ export default function Portfolio() {
       clearTimeout(holdTimer)
       setHoldTimer(null)
     }
-  }
+  }, [isMobile, holdTimer])
 
   // Prevent scrolling until hold is completed (desktop only)
   useEffect(() => {
@@ -192,6 +171,7 @@ export default function Portfolio() {
       image: "/Codecta.jpg",
       technologies: ["AWS Lambda", "React", "MongoDB", "Node.js"],
       description: "Developed serverless applications and full-stack web solutions",
+      category: "Work"
     },
     {
       title: "IT Support",
@@ -199,6 +179,7 @@ export default function Portfolio() {
       image: "/Lumitic.jpg",
       technologies: ["System Maintenance", "Networking", "Marketing"],
       description: "Provided technical support, network maintenance, and marketing assistance",
+      category: "Work"
     },
     {
       title: "Web Programmer",
@@ -206,6 +187,7 @@ export default function Portfolio() {
       image: "/ModernEscapeEurope.png",
       technologies: ["Web Design", "Backend Development"],
       description: "Created a modern and user-friendly interface to enhance the user experience",
+      category: "Work"
     },
     {
       title: "Web Programmer",
@@ -214,6 +196,7 @@ export default function Portfolio() {
       technologies: ["Frontend Development", "SEO", "Performance Optimization"],
       description: "Implemented front-end design and integrated dynamic features for improved functionality and optimized site performance.",
       link: "https://xtream.ba/",
+      category: "Work"
     },
     {
       title: "Web Developer",
@@ -221,6 +204,7 @@ export default function Portfolio() {
       image: "/siteam.png",
       technologies: ["Web Development", "Cleaning Services", "Business Solutions"],
       description: "Developed a professional website for cleaning services company, showcasing their services and improving online presence",
+      category: "Work"
     },
     {
       title: "Personal Project",
@@ -229,6 +213,7 @@ export default function Portfolio() {
       technologies: ["Full Stack Development", "React", "Node.js"],
       description: "Developed a full-stack web application to help junior developers find job opportunities and kickstart their careers",
       link: "https://www.prviposao.site/",
+      category: "Projects"
     },
     {
       title: "Final Year Project",
@@ -237,6 +222,7 @@ export default function Portfolio() {
       technologies: ["React", "MongoDB", "Node.js"],
       description: "Built a comprehensive conference management system",
       link: "https://conferencehub.onrender.com/",
+      category: "Projects"
     },
   ]
 
@@ -285,6 +271,113 @@ export default function Portfolio() {
 
 
 
+  // Experience card component
+  const ExperienceCard = ({ exp, index }: { exp: any, index: number }) => {
+    const isHovered = hoveredCardIndex === index
+    
+    return (
+      <motion.div
+        key={index}
+        initial={{ y: 30, opacity: 0 }}
+        whileInView={{ y: 0, opacity: 1 }}
+        viewport={{ once: true, amount: 0.2 }}
+        className="group h-full relative"
+        onHoverStart={() => setHoveredCardIndex(index)}
+        onHoverEnd={() => setHoveredCardIndex(null)}
+        transition={{
+          delay: index * 0.1,
+          duration: 0.6,
+          ease: "easeOut",
+        }}
+      >
+        {exp.link ? (
+          <a 
+            href={exp.link} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block h-full"
+          >
+            <div className="h-full">
+              <GlassCard 
+                variant="card" 
+                intensity="medium"
+                className="h-full flex flex-col overflow-hidden hover:scale-105 transition-transform duration-300"
+              >
+                <div className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0 h-48">
+                  <img
+                    src={exp.image}
+                    alt={exp.company}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
+                    <p className="text-gray-300">{exp.company}</p>
+                  </div>
+                </div>
+                <div className="px-6 pb-6 pt-4 flex-1 flex flex-col">
+                  <div className="flex-1 flex flex-col">
+                    <p className="text-gray-400 mb-4 group-hover:text-gray-300 transition-colors duration-300 flex-1">
+                      {exp.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-auto">
+                      {exp.technologies.map((tech: string, techIndex: number) => (
+                        <span
+                          key={techIndex}
+                          className="px-3 py-1 bg-gray-800/50 text-gray-300 rounded-full text-sm group-hover:bg-[#FBAA84]/25 group-hover:text-[#FBAA84] transition-colors duration-300 backdrop-blur-sm"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </GlassCard>
+            </div>
+          </a>
+        ) : (
+          <div className="h-full">
+            <GlassCard 
+              variant="card" 
+              intensity="medium"
+              className="h-full flex flex-col overflow-hidden hover:scale-105 transition-transform duration-300"
+            >
+              <div className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0 h-48">
+                <img
+                  src={exp.image}
+                  alt={exp.company}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
+                  <p className="text-gray-300">{exp.company}</p>
+                </div>
+              </div>
+              <div className="px-6 pb-6 pt-4 flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col">
+                  <p className="text-gray-400 mb-4 group-hover:text-gray-300 transition-colors duration-300 flex-1">
+                    {exp.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-auto">
+                    {exp.technologies.map((tech: string, techIndex: number) => (
+                      <span
+                        key={techIndex}
+                        className="px-3 py-1 bg-gray-800/50 text-gray-300 rounded-full text-sm group-hover:bg-[#FBAA84]/25 group-hover:text-[#FBAA84] transition-colors duration-300 backdrop-blur-sm"
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </GlassCard>
+          </div>
+        )}
+      </motion.div>
+    )
+  }
+
   const MobileHero = () => (
     <div className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* Enhanced animated background grid */}
@@ -301,53 +394,51 @@ export default function Portfolio() {
         />
       </div>
 
-      {/* Enhanced floating geometric shapes */}
+      {/* Simplified floating geometric shapes */}
       <div className="absolute inset-0">
-        {[...Array(12)].map((_, i) => (
+        {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute border border-[#FBAA84]/40"
+            className="absolute border border-[#FBAA84]/30"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              width: `${Math.random() * 8 + 4}px`,
-              height: `${Math.random() * 8 + 4}px`,
+              width: `${Math.random() * 6 + 3}px`,
+              height: `${Math.random() * 6 + 3}px`,
             }}
             animate={{
-              y: [0, -30, 0],
-              x: [0, Math.random() * 20 - 10, 0],
+              y: [0, -20, 0],
               rotate: [0, 180, 360],
-              opacity: [0.2, 0.8, 0.2],
-              scale: [0.8, 1.2, 0.8],
+              opacity: [0.2, 0.6, 0.2],
             }}
             transition={{
-              duration: 4 + Math.random() * 3,
+              duration: 5 + Math.random() * 2,
               repeat: Number.POSITIVE_INFINITY,
-              delay: Math.random() * 3,
+              delay: Math.random() * 2,
               ease: "easeInOut",
             }}
           />
         ))}
       </div>
 
-      {/* Glowing orbs */}
+      {/* Simplified glowing orbs */}
       <div className="absolute inset-0">
-        {[...Array(6)].map((_, i) => (
+        {[...Array(3)].map((_, i) => (
           <motion.div
             key={`orb-${i}`}
-            className="absolute w-2 h-2 bg-[#FBAA84]/60 rounded-full blur-sm"
+            className="absolute w-2 h-2 bg-[#FBAA84]/40 rounded-full blur-sm"
             style={{
-              left: `${20 + (i * 15)}%`,
-              top: `${30 + (i * 10)}%`,
+              left: `${25 + (i * 25)}%`,
+              top: `${40 + (i * 15)}%`,
             }}
             animate={{
-              scale: [0.5, 1.5, 0.5],
-              opacity: [0.3, 0.8, 0.3],
+              scale: [0.5, 1.2, 0.5],
+              opacity: [0.3, 0.6, 0.3],
             }}
             transition={{
-              duration: 3 + i * 0.5,
+              duration: 4 + i * 0.3,
               repeat: Number.POSITIVE_INFINITY,
-              delay: i * 0.3,
+              delay: i * 0.5,
             }}
           />
         ))}
@@ -397,14 +488,14 @@ export default function Portfolio() {
             Full-Stack Developer
           </motion.p>
 
-          {/* Enhanced tech icons */}
+          {/* Simplified tech icons */}
           <div className="flex justify-center space-x-8 mb-10">
             <motion.div
               animate={{ 
-                y: [0, -15, 0],
-                scale: [1, 1.1, 1]
+                y: [0, -8, 0],
+                scale: [1, 1.05, 1]
               }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: 0 }}
+              transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, delay: 0 }}
             >
               <GlassCard
                 variant="floating"
@@ -416,10 +507,10 @@ export default function Portfolio() {
             </motion.div>
             <motion.div
               animate={{ 
-                y: [0, -15, 0],
-                scale: [1, 1.1, 1]
+                y: [0, -8, 0],
+                scale: [1, 1.05, 1]
               }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: 0.5 }}
+              transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, delay: 0.7 }}
             >
               <GlassCard
                 variant="floating"
@@ -431,10 +522,10 @@ export default function Portfolio() {
             </motion.div>
             <motion.div
               animate={{ 
-                y: [0, -15, 0],
-                scale: [1, 1.1, 1]
+                y: [0, -8, 0],
+                scale: [1, 1.05, 1]
               }}
-              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, delay: 1 }}
+              transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, delay: 1.4 }}
             >
               <GlassCard
                 variant="floating"
@@ -449,13 +540,19 @@ export default function Portfolio() {
 
         {/* Enhanced scroll indicator */}
         <motion.div
-          className="flex flex-col items-center"
+          className="flex flex-col items-center cursor-pointer"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.8 }}
+          onClick={() => {
+            const experienceSection = document.getElementById("experience")
+            if (experienceSection) {
+              experienceSection.scrollIntoView({ behavior: "smooth" })
+            }
+          }}
         >
           <p className="text-gray-300 text-sm mb-4 whitespace-nowrap font-medium tracking-wide">
-            Swipe to explore
+            Tap to explore
           </p>
           
           {/* Mobile finger scroll indicator */}
@@ -471,7 +568,7 @@ export default function Portfolio() {
             {/* Glow effect */}
             <div className="absolute inset-0 rounded-full bg-[#FBAA84]/20 blur-sm" />
             
-            {/* Finger scroll icon */}
+            {/* Arrow down icon */}
             <motion.div
               className="relative z-10"
               animate={{ 
@@ -484,7 +581,9 @@ export default function Portfolio() {
                 ease: "easeInOut"
               }}
             >
-              <Hand className="w-6 h-6 text-[#FBAA84]" />
+              <svg className="w-6 h-6 text-[#FBAA84]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -499,7 +598,7 @@ export default function Portfolio() {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-black text-white overflow-x-hidden font-chakra-petch relative">
-      {/* Animated Background */}
+      {/* Animated Background - Optimized for mobile */}
       <AnimatedBackground scrollYProgress={scrollYProgress} />
       
       {/* Error boundary wrapper */}
@@ -595,211 +694,25 @@ export default function Portfolio() {
         className="min-h-screen py-8 px-4 md:px-8 relative z-10"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true, amount: 0.1 }}
       >
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.h2
-            className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
-            initial={{ y: 100, opacity: 0 }}
+            className="text-4xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+            initial={{ y: 30, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            viewport={{ once: false, amount: 0.3 }}
-            animate={scrollDirection === 'down' ? { y: 0, opacity: 1 } : { y: 100, opacity: 0 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+            viewport={{ once: true, amount: 0.1 }}
           >
             Experience
           </motion.h2>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {experiences.map((exp, index) => {
-              const isHovered = hoveredCardIndex === index
-              const isOtherHovered = hoveredCardIndex !== null && hoveredCardIndex !== index
-              
-              return (
-                <motion.div
-                  key={index}
-                  initial={{ y: 100, opacity: 0, rotateX: 45 }}
-                  whileInView={{ y: 0, opacity: 1, rotateX: 0 }}
-                  viewport={{ once: false, amount: 0.3 }}
-                  className="group h-full relative"
-                  onHoverStart={() => setHoveredCardIndex(index)}
-                  onHoverEnd={() => setHoveredCardIndex(null)}
-                  animate={{
-                    y: 0,
-                    opacity: 1,
-                    rotateX: 0,
-                  }}
-                  transition={{
-                    delay: 0.5 + index * 0.2,
-                    duration: 0.8,
-                    type: "spring",
-                    stiffness: 100,
-                  }}
-                >
-                  {exp.link ? (
-                    <a 
-                      href={exp.link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="block h-full"
-                    >
-                      <motion.div
-                        animate={{
-                          scale: isHovered ? 1.05 : isOtherHovered ? 0.95 : 1,
-                          zIndex: isHovered ? 10 : 1,
-                        }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="h-full"
-                      >
-                        <GlassCard 
-                          variant="card" 
-                          intensity="medium"
-                          className="h-full flex flex-col overflow-hidden"
-                        >
-                          <motion.div 
-                            className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0"
-                            animate={{
-                              height: isHovered ? 280 : 192,
-                              scale: isHovered ? 1.05 : 1,
-                            }}
-                            transition={{ duration: 0.4, ease: "easeOut" }}
-                          >
-                            <motion.img
-                              src={exp.image}
-                              alt={exp.company}
-                              className="w-full h-full object-cover"
-                              animate={{
-                                opacity: isHovered ? 0.9 : 0.6,
-                                scale: isHovered ? 1.1 : 1,
-                              }}
-                              transition={{ duration: 0.4, ease: "easeOut" }}
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
-                            <motion.div 
-                              className="absolute bottom-6 left-6 right-6"
-                              animate={{
-                                y: isHovered ? -8 : 0,
-                              }}
-                              transition={{ duration: 0.4, ease: "easeOut" }}
-                            >
-                              <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
-                              <p className="text-gray-300">{exp.company}</p>
-                            </motion.div>
-                          </motion.div>
-                          <div className="px-6 pb-6 pt-4 flex-1 flex flex-col">
-                            <motion.div
-                              initial={{ opacity: 0, y: 20 }}
-                              whileInView={{ opacity: 1, y: 0 }}
-                              className="flex-1 flex flex-col"
-                              viewport={{ once: false }}
-                              animate={{
-                                opacity: isOtherHovered ? 0.3 : 1,
-                                scale: isOtherHovered ? 0.95 : 1,
-                                y: isHovered ? -8 : 0,
-                              }}
-                              transition={{ 
-                                duration: 0.4, 
-                                ease: "easeOut" 
-                              }}
-                            >
-                              <p className="text-gray-400 mb-4 group-hover:text-gray-300 transition-colors duration-300 flex-1">
-                                {exp.description}
-                              </p>
-                              <div className="flex flex-wrap gap-2 mt-auto">
-                                {exp.technologies.map((tech, techIndex) => (
-                                  <span
-                                    key={techIndex}
-                                    className="px-3 py-1 bg-gray-800/50 text-gray-300 rounded-full text-sm group-hover:bg-[#FBAA84]/25 group-hover:text-[#FBAA84] transition-colors duration-300 backdrop-blur-sm"
-                                  >
-                                    {tech}
-                                  </span>
-                                ))}
-                              </div>
-                            </motion.div>
-                          </div>
-                        </GlassCard>
-                      </motion.div>
-                    </a>
-                  ) : (
-                    <motion.div
-                      animate={{
-                        scale: isHovered ? 1.05 : isOtherHovered ? 0.95 : 1,
-                        zIndex: isHovered ? 10 : 1,
-                      }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="h-full"
-                    >
-                      <GlassCard 
-                        variant="card" 
-                        intensity="medium"
-                        className="h-full flex flex-col overflow-hidden"
-                      >
-                        <motion.div 
-                          className="relative bg-gradient-to-br from-[#FBAA84]/25 to-gray-800/40 overflow-hidden flex-shrink-0"
-                        animate={{
-                          height: isHovered ? 280 : 192,
-                          scale: isHovered ? 1.05 : 1,
-                        }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                      >
-                        <motion.img
-                          src={exp.image}
-                          alt={exp.company}
-                          className="w-full h-full object-cover"
-                          animate={{
-                            opacity: isHovered ? 0.9 : 0.6,
-                            scale: isHovered ? 1.1 : 1,
-                          }}
-                          transition={{ duration: 0.4, ease: "easeOut" }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
-                        <motion.div 
-                          className="absolute bottom-6 left-6 right-6"
-                          animate={{
-                            y: isHovered ? -8 : 0,
-                          }}
-                          transition={{ duration: 0.4, ease: "easeOut" }}
-                        >
-                          <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
-                          <p className="text-gray-300">{exp.company}</p>
-                        </motion.div>
-                      </motion.div>
-                      <div className="px-6 pb-6 pt-4 flex-1 flex flex-col">
-                        <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          className="flex-1 flex flex-col"
-                          viewport={{ once: false }}
-                          animate={{
-                            opacity: isOtherHovered ? 0.3 : 1,
-                            y: isHovered ? -8 : 0,
-                          }}
-                          transition={{ 
-                            duration: 0.4, 
-                            ease: "easeOut" 
-                          }}
-                        >
-                          <p className="text-gray-400 mb-4 group-hover:text-gray-300 transition-colors duration-300 flex-1">
-                            {exp.description}
-                          </p>
-                          <div className="flex flex-wrap gap-2 mt-auto">
-                            {exp.technologies.map((tech, techIndex) => (
-                              <span
-                                key={techIndex}
-                                className="px-3 py-1 bg-gray-800/50 text-gray-300 rounded-full text-sm group-hover:bg-[#FBAA84]/25 group-hover:text-[#FBAA84] transition-colors duration-300 backdrop-blur-sm"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                          </div>
-                        </motion.div>
-                      </div>
-                    </GlassCard>
-                    </motion.div>
-                  )}
-                </motion.div>
-              )
-            })}
+          {/* Experience Grid - Same for both mobile and desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            {experiences.map((exp, index) => (
+              <ExperienceCard key={index} exp={exp} index={index} />
+            ))}
           </div>
         </div>
       </motion.section>
@@ -809,17 +722,16 @@ export default function Portfolio() {
         className="py-8 px-4 md:px-8 relative z-10 overflow-hidden"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true, amount: 0.3 }}
       >
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.h2
             className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            viewport={{ once: false, amount: 0.3 }}
-            animate={scrollDirection === 'down' ? { y: 0, opacity: 1 } : { y: 100, opacity: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            viewport={{ once: true, amount: 0.3 }}
           >
             Tech Stack
           </motion.h2>
@@ -827,29 +739,23 @@ export default function Portfolio() {
           <div className="relative min-h-[600px] flex items-center justify-center">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12 md:gap-16 lg:gap-20 max-w-7xl mx-auto px-8">
               {techStack && techStack.length > 0 && techStack.map((tech, index) => {
-                // Create unique floating patterns for each bubble
-                const floatPatterns = [
-                  { y: [-20, -35, -20], x: [-15, 15, -15], duration: 6 },
-                  { y: [-25, -40, -25], x: [12, -12, 12], duration: 7 },
-                  { y: [-18, -32, -18], x: [-18, 18, -18], duration: 5.5 },
-                  { y: [-22, -37, -22], x: [15, -15, 15], duration: 6.5 },
-                  { y: [-16, -30, -16], x: [-12, 12, -12], duration: 5 },
-                  { y: [-24, -38, -24], x: [18, -18, 18], duration: 7.5 },
-                  { y: [-19, -33, -19], x: [-10, 10, -10], duration: 6.2 },
-                  { y: [-21, -36, -21], x: [14, -14, 14], duration: 6.8 },
-                ];
-                
                 return (
                   <motion.div
                     key={index}
                     className="group cursor-pointer"
                     initial={{ scale: 0, opacity: 0, y: 30 }}
                     whileInView={{ scale: 1, opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    whileHover={{ 
+                      scale: 1.1, 
+                      y: -10,
+                      transition: { 
+                        duration: 0.25,
+                        ease: "easeOut"
+                      }
+                    }}
                     animate={{
-                      y: scrollDirection === 'down' ? floatPatterns[index]?.y || [0, 0, 0] : 30,
-                      opacity: scrollDirection === 'down' ? 1 : 0,
-                      scale: scrollDirection === 'down' ? [1, 1.03, 1] : 0,
-                      x: floatPatterns[index]?.x || [0, 0, 0],
+                      y: [0, -10, 0],
                     }}
                     transition={{
                       delay: 0.2 + index * 0.1,
@@ -858,34 +764,11 @@ export default function Portfolio() {
                       stiffness: 100,
                       damping: 20,
                       y: {
-                        duration: floatPatterns[index]?.duration || 6,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        ease: "easeInOut",
-                        delay: index * 0.15,
-                      },
-                      x: {
-                        duration: (floatPatterns[index]?.duration || 6) + 1,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                        ease: "easeInOut",
-                        delay: index * 0.2,
-                      },
-                      scale: {
-                        duration: 3 + (index * 0.3),
+                        duration: 3 + index * 0.2,
                         repeat: Infinity,
                         repeatType: "reverse",
                         ease: "easeInOut",
                         delay: index * 0.1,
-                      },
-                    }}
-                    viewport={{ once: false, amount: 0.3 }}
-                    whileHover={{ 
-                      scale: 1.1, 
-                      y: -15,
-                      transition: { 
-                        duration: 0.25,
-                        ease: "easeOut"
                       }
                     }}
                   >
@@ -928,28 +811,26 @@ export default function Portfolio() {
         className="min-h-screen py-8 px-4 md:px-8 flex items-center relative z-10"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        viewport={{ once: false, amount: 0.3 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true, amount: 0.3 }}
       >
         <div className="max-w-4xl mx-auto w-full relative z-10">
           <motion.h2
             className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            viewport={{ once: false, amount: 0.3 }}
-            animate={scrollDirection === 'down' ? { y: 0, opacity: 1 } : { y: 100, opacity: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            viewport={{ once: true, amount: 0.3 }}
           >
             Let's Connect
           </motion.h2>
 
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <motion.div
-              initial={{ x: -100, opacity: 0 }}
+              initial={{ x: -50, opacity: 0 }}
               whileInView={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              viewport={{ once: false, amount: 0.3 }}
-              animate={scrollDirection === 'down' ? { x: 0, opacity: 1 } : { x: -100, opacity: 0 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+              viewport={{ once: true, amount: 0.3 }}
             >
               <h3 className="text-3xl font-bold mb-8 text-white">Get In Touch</h3>
               <div className="space-y-6">
@@ -974,12 +855,11 @@ export default function Portfolio() {
             </motion.div>
 
             <motion.div
-              initial={{ x: 100, opacity: 0 }}
+              initial={{ x: 50, opacity: 0 }}
               whileInView={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.8 }}
-              viewport={{ once: false, amount: 0.3 }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              viewport={{ once: true, amount: 0.3 }}
               className="flex flex-col space-y-4"
-              animate={scrollDirection === 'down' ? { x: 0, opacity: 1 } : { x: 100, opacity: 0 }}
             >
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -1021,11 +901,10 @@ export default function Portfolio() {
 
           <motion.div
             className="text-center mt-16"
-            initial={{ y: 50, opacity: 0 }}
+            initial={{ y: 30, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.8 }}
-            viewport={{ once: false, amount: 0.3 }}
-            animate={scrollDirection === 'down' ? { y: 0, opacity: 1 } : { y: 50, opacity: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+            viewport={{ once: true, amount: 0.3 }}
           >
             <p className="text-gray-400 text-lg">
               Ready to bring your ideas to life? Let's build something amazing together.

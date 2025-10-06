@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { useTransform } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useTransform } from 'framer-motion'
 
 interface AnimatedBackgroundProps {
   scrollYProgress: any
@@ -10,6 +9,9 @@ interface AnimatedBackgroundProps {
 
 export default function AnimatedBackground({ scrollYProgress }: AnimatedBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // Simplified transforms
+  const backgroundPosition = scrollYProgress ? useTransform(scrollYProgress, [0, 1], ['0% 0%', '100% 0%']) : '0% 0%'
 
   return (
     <div 
@@ -19,9 +21,9 @@ export default function AnimatedBackground({ scrollYProgress }: AnimatedBackgrou
         background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%)'
       }}
     >
-      {/* Animated gradient overlay */}
+      {/* Subtle animated gradient overlay */}
       <motion.div
-        className="absolute inset-0 opacity-30"
+        className="absolute inset-0 opacity-15"
         style={{
           background: 'linear-gradient(45deg, #FBAA84 0%, transparent 50%, #FBAA84 100%)',
           backgroundSize: '400% 400%',
@@ -30,29 +32,28 @@ export default function AnimatedBackground({ scrollYProgress }: AnimatedBackgrou
           backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
         }}
         transition={{
-          duration: 8,
+          duration: 20,
           repeat: Infinity,
           ease: 'linear',
         }}
       />
 
-      {/* Floating particles */}
-      {[...Array(20)].map((_, i) => (
+      {/* Minimal floating particles for better performance */}
+      {[...Array(4)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 bg-[#FBAA84]/60 rounded-full"
+          className="absolute w-1 h-1 bg-[#FBAA84]/30 rounded-full"
           style={{
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
           }}
           animate={{
-            y: [0, -100, 0],
-            x: [0, Math.random() * 50 - 25, 0],
-            opacity: [0, 1, 0],
+            y: [0, -30, 0],
+            opacity: [0, 0.4, 0],
             scale: [0, 1, 0],
           }}
           transition={{
-            duration: 4 + Math.random() * 3,
+            duration: 8 + Math.random() * 2,
             repeat: Infinity,
             delay: Math.random() * 4,
             ease: 'easeInOut',
@@ -60,23 +61,13 @@ export default function AnimatedBackground({ scrollYProgress }: AnimatedBackgrou
         />
       ))}
 
-      {/* Scroll-responsive wave effect */}
+      {/* Scroll-responsive wave effect - very subtle */}
       <motion.div
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-5"
         style={{
           background: 'linear-gradient(90deg, transparent 0%, #FBAA84 50%, transparent 100%)',
           backgroundSize: '200% 100%',
-          backgroundPosition: scrollYProgress ? useTransform(scrollYProgress, [0, 1], ['0% 0%', '100% 0%']) : '0% 0%',
-        }}
-      />
-
-      {/* Radial gradient that moves with scroll */}
-      <motion.div
-        className="absolute inset-0 opacity-10"
-        style={{
-          background: 'radial-gradient(circle at center, #FBAA84 0%, transparent 70%)',
-          scale: scrollYProgress ? useTransform(scrollYProgress, [0, 1], [0.5, 2]) : 1,
-          opacity: scrollYProgress ? useTransform(scrollYProgress, [0, 1], [0.1, 0.3]) : 0.1,
+          backgroundPosition: backgroundPosition,
         }}
       />
     </div>
