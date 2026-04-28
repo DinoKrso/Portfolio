@@ -3,9 +3,14 @@
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Mail, Phone, Github, Linkedin, Code, Terminal, Database, Hand, Download, FileText } from "lucide-react"
 import Spline from "@splinetool/react-spline";
-import { useState, useRef, useEffect, useCallback } from "react"
+import { useState, useRef, useEffect, useCallback, useMemo } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useGSAP } from "@gsap/react"
 import AnimatedBackground from "@/components/AnimatedBackground"
 import { GlassCard } from "@/components/GlassCard"
+
+gsap.registerPlugin(ScrollTrigger, useGSAP)
 
 export default function Portfolio() {
   const [isMobile, setIsMobile] = useState(false)
@@ -13,7 +18,6 @@ export default function Portfolio() {
   const [isHolding, setIsHolding] = useState(false)
   const [holdTimer, setHoldTimer] = useState<NodeJS.Timeout | null>(null)
   const [hasCompletedHold, setHasCompletedHold] = useState(false)
-  const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   
@@ -101,29 +105,6 @@ export default function Portfolio() {
       setHoldTimer(null)
     }
   }, [isMobile, holdTimer])
-
-  // Prevent scrolling until hold is completed (desktop only)
-  useEffect(() => {
-    if (!hasCompletedHold && !isMobile) {
-      const preventScroll = (e: Event) => {
-        e.preventDefault()
-      }
-      
-      const preventKeys = (e: KeyboardEvent) => {
-        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'PageDown' || e.key === 'PageUp' || e.key === ' ') {
-          e.preventDefault()
-        }
-      }
-      
-      document.addEventListener('wheel', preventScroll, { passive: false })
-      document.addEventListener('keydown', preventKeys)
-      
-      return () => {
-        document.removeEventListener('wheel', preventScroll)
-        document.removeEventListener('keydown', preventKeys)
-      }
-    }
-  }, [hasCompletedHold, isMobile])
 
   // Handle Spline state change events
   useEffect(() => {
@@ -224,6 +205,33 @@ export default function Portfolio() {
       link: "https://conferencehub.onrender.com/",
       category: "Projects"
     },
+    {
+      title: "Frontend & SEO Project",
+      company: "Ehodach",
+      image: "/ehodach.png",
+      technologies: ["React", "SEO Optimization", "Performance Optimization"],
+      description: "Built the React website and implemented on-page SEO improvements for stronger visibility and better search performance.",
+      link: "https://www.ehodach.ba/",
+      category: "Projects"
+    },
+    {
+      title: "Frontend & SEO Project",
+      company: "Luftaktiv",
+      image: "/luftaktiv.png",
+      technologies: ["React", "Technical SEO", "Responsive Design"],
+      description: "Developed the React presentation website and optimized technical SEO structure for faster discovery and indexing.",
+      link: "https://www.luftaktiv.com/",
+      category: "Projects"
+    },
+    {
+      title: "Full-Stack Web App",
+      company: "Aida Halimic Psychotherapy",
+      image: "/aida.png",
+      technologies: ["Full Stack Development", "Online Scheduling", "Appointment Booking"],
+      description: "Developed a full-stack website with an interactive online appointment scheduling flow and service-focused content experience.",
+      link: "https://www.aidahalimic.ba/",
+      category: "Projects"
+    },
   ]
 
   const techStack = [
@@ -269,26 +277,120 @@ export default function Portfolio() {
     },
   ]
 
+  const mobileShapePositions = useMemo(
+    () =>
+      Array.from({ length: 6 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        width: `${Math.random() * 6 + 3}px`,
+        height: `${Math.random() * 6 + 3}px`,
+        duration: 5 + Math.random() * 2,
+        delay: Math.random() * 2,
+      })),
+    [],
+  )
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.utils.toArray<HTMLElement>(".gsap-reveal-section").forEach((section) => {
+          gsap.fromTo(
+            section,
+            { autoAlpha: 0, y: 30 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.85,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: section,
+                start: "top 85%",
+              },
+            },
+          )
+        })
+
+        gsap.utils.toArray<HTMLElement>(".gsap-reveal-title").forEach((title) => {
+          gsap.fromTo(
+            title,
+            { autoAlpha: 0, y: 26 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.75,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: title,
+                start: "top 88%",
+              },
+            },
+          )
+        })
+
+        gsap.utils.toArray<HTMLElement>(".gsap-reveal-card").forEach((card, index) => {
+          gsap.fromTo(
+            card,
+            { autoAlpha: 0, y: 24, scale: 0.98 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              duration: 0.7,
+              ease: "power2.out",
+              delay: (index % 2) * 0.08,
+              scrollTrigger: {
+                trigger: card,
+                start: "top 90%",
+              },
+            },
+          )
+        })
+
+        gsap.utils.toArray<HTMLElement>(".gsap-tech-card").forEach((card, index) => {
+          gsap.fromTo(
+            card,
+            { autoAlpha: 0, y: 28 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.65,
+              ease: "power2.out",
+              delay: index * 0.04,
+              scrollTrigger: {
+                trigger: card,
+                start: "top 88%",
+              },
+            },
+          )
+        })
+
+        gsap.to(".gsap-parallax", {
+          yPercent: -10,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".gsap-parallax",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1,
+          },
+        })
+      })
+
+      return () => mm.revert()
+    },
+    { scope: containerRef, dependencies: [isMobile], revertOnUpdate: true },
+  )
+
 
 
   // Experience card component
   const ExperienceCard = ({ exp, index }: { exp: any, index: number }) => {
-    const isHovered = hoveredCardIndex === index
-    
     return (
       <motion.div
         key={index}
-        initial={{ y: 30, opacity: 0 }}
-        whileInView={{ y: 0, opacity: 1 }}
-        viewport={{ once: true, amount: 0.2 }}
-        className="group h-full relative"
-        onHoverStart={() => setHoveredCardIndex(index)}
-        onHoverEnd={() => setHoveredCardIndex(null)}
-        transition={{
-          delay: index * 0.1,
-          duration: 0.6,
-          ease: "easeOut",
-        }}
+        className="group h-full relative gsap-reveal-card"
       >
         {exp.link ? (
           <a 
@@ -379,7 +481,7 @@ export default function Portfolio() {
   }
 
   const MobileHero = () => (
-    <div className="relative h-screen flex items-center justify-center overflow-hidden">
+    <div className="relative h-screen flex items-center justify-center overflow-hidden gsap-parallax">
       {/* Enhanced animated background grid */}
       <div className="absolute inset-0 opacity-30">
         <div
@@ -396,15 +498,15 @@ export default function Portfolio() {
 
       {/* Simplified floating geometric shapes */}
       <div className="absolute inset-0">
-        {[...Array(6)].map((_, i) => (
+        {mobileShapePositions.map((shape, i) => (
           <motion.div
             key={i}
             className="absolute border border-[#FBAA84]/30"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              width: `${Math.random() * 6 + 3}px`,
-              height: `${Math.random() * 6 + 3}px`,
+              left: shape.left,
+              top: shape.top,
+              width: shape.width,
+              height: shape.height,
             }}
             animate={{
               y: [0, -20, 0],
@@ -412,9 +514,9 @@ export default function Portfolio() {
               opacity: [0.2, 0.6, 0.2],
             }}
             transition={{
-              duration: 5 + Math.random() * 2,
+              duration: shape.duration,
               repeat: Number.POSITIVE_INFINITY,
-              delay: Math.random() * 2,
+              delay: shape.delay,
               ease: "easeInOut",
             }}
           />
@@ -619,15 +721,22 @@ export default function Portfolio() {
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}
                 >
-                  <Spline
-                    scene="https://prod.spline.design/3lhUXCArBteKULm5/scene.splinecode"
-                    onLoad={(app) => {
-                      setSplineApp(app)
+                  <div
+                    className="h-full w-full select-none"
+                    onWheelCapture={(e) => {
+                      e.stopPropagation()
                     }}
-                    onError={(error) => {
-                      console.error("Spline loading error:", error)
-                    }}
-                  />
+                  >
+                    <Spline
+                      scene="https://prod.spline.design/3lhUXCArBteKULm5/scene.splinecode"
+                      onLoad={(app) => {
+                        setSplineApp(app)
+                      }}
+                      onError={(error) => {
+                        console.error("Spline loading error:", error)
+                      }}
+                    />
+                  </div>
                   
                   {/* Black overlay to cover Spline watermark */}
                   <div className="absolute bottom-0 right-0 w-40 h-16 bg-black z-10"></div>
@@ -679,7 +788,7 @@ export default function Portfolio() {
                       animate={{ opacity: [0.3, 0.7, 0.3] }}
                       transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                     >
-                      Scroll locked until completed
+                      Scroll is always available
                     </motion.p>
                   </motion.div>
                 )}
@@ -691,7 +800,7 @@ export default function Portfolio() {
       {/* Experience Section */}
       <motion.section
         id="experience"
-        className="min-h-screen py-8 px-4 md:px-8 relative z-10"
+        className="min-h-screen py-8 px-4 md:px-8 relative z-10 gsap-reveal-section"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -699,7 +808,7 @@ export default function Portfolio() {
       >
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.h2
-            className="text-4xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+            className="text-4xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent gsap-reveal-title"
             initial={{ y: 30, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1, duration: 0.6 }}
@@ -719,7 +828,7 @@ export default function Portfolio() {
 
       {/* Tech Stack Section */}
       <motion.section
-        className="py-8 px-4 md:px-8 relative z-10 overflow-hidden"
+        className="py-8 px-4 md:px-8 relative z-10 overflow-hidden gsap-reveal-section"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -727,7 +836,7 @@ export default function Portfolio() {
       >
         <div className="max-w-6xl mx-auto relative z-10">
           <motion.h2
-            className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+            className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent gsap-reveal-title"
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -742,7 +851,7 @@ export default function Portfolio() {
                 return (
                   <motion.div
                     key={index}
-                    className="group cursor-pointer"
+                    className="group cursor-pointer gsap-tech-card"
                     initial={{ scale: 0, opacity: 0, y: 30 }}
                     whileInView={{ scale: 1, opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.3 }}
@@ -808,7 +917,7 @@ export default function Portfolio() {
 
       {/* Contact Section */}
       <motion.section
-        className="min-h-screen py-8 px-4 md:px-8 flex items-center relative z-10"
+        className="min-h-screen py-8 px-4 md:px-8 flex items-center relative z-10 gsap-reveal-section"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -816,7 +925,7 @@ export default function Portfolio() {
       >
         <div className="max-w-4xl mx-auto w-full relative z-10">
           <motion.h2
-            className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent"
+            className="text-5xl md:text-6xl font-bold text-center mb-12 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent gsap-reveal-title"
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}

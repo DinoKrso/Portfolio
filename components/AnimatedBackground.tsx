@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { motion, useTransform } from 'framer-motion'
 
 interface AnimatedBackgroundProps {
@@ -9,6 +9,16 @@ interface AnimatedBackgroundProps {
 
 export default function AnimatedBackground({ scrollYProgress }: AnimatedBackgroundProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const particlePositions = useMemo(
+    () =>
+      Array.from({ length: 4 }, () => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        duration: 8 + Math.random() * 2,
+        delay: Math.random() * 4,
+      })),
+    [],
+  )
 
   // Simplified transforms
   const backgroundPosition = scrollYProgress ? useTransform(scrollYProgress, [0, 1], ['0% 0%', '100% 0%']) : '0% 0%'
@@ -39,13 +49,13 @@ export default function AnimatedBackground({ scrollYProgress }: AnimatedBackgrou
       />
 
       {/* Minimal floating particles for better performance */}
-      {[...Array(4)].map((_, i) => (
+      {particlePositions.map((particle, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 bg-[#FBAA84]/30 rounded-full"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: particle.left,
+            top: particle.top,
           }}
           animate={{
             y: [0, -30, 0],
@@ -53,9 +63,9 @@ export default function AnimatedBackground({ scrollYProgress }: AnimatedBackgrou
             scale: [0, 1, 0],
           }}
           transition={{
-            duration: 8 + Math.random() * 2,
+            duration: particle.duration,
             repeat: Infinity,
-            delay: Math.random() * 4,
+            delay: particle.delay,
             ease: 'easeInOut',
           }}
         />
