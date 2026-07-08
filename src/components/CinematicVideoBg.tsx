@@ -107,6 +107,10 @@ export default function CinematicVideoBg({ src, className = "" }: CinematicVideo
     if (!video) return;
 
     const performSeek = (targetTime: number) => {
+      // Skip micro-seeks: re-seeking for sub-frame deltas causes visible stutter
+      if (Math.abs(targetTime - currentTargetTime.current) < 0.035 && !isSeekingActive.current) {
+        return;
+      }
       currentTargetTime.current = targetTime;
       if (!isSeekingActive.current) {
         isSeekingActive.current = true;
@@ -120,18 +124,22 @@ export default function CinematicVideoBg({ src, className = "" }: CinematicVideo
       isSeekingActive.current = false;
       if (seekPending.current) {
         seekPending.current = false;
-        performSeek(currentTargetTime.current);
+        isSeekingActive.current = true;
+        video.currentTime = currentTargetTime.current;
       }
     };
 
     video.addEventListener("seeked", handleSeeked);
 
+    // Smoothing proxy: instead of seeking raw on every scroll event, tween
+    // towards the target time so fast scrolling doesn't flood the decoder
+    const timeProxy = { time: 0 };
+
     // Create ScrollTrigger to tie video time to scroll position
     let scrollTriggerInstance: globalThis.ScrollTrigger | null = null;
-    let fallbackTimeout: NodeJS.Timeout | null = null;
+    let fallbackTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const initScrollTrigger = () => {
-      const duration = video.duration || 1;
       const targetScroller = document.getElementById("main-scroll-container");
 
       if (!targetScroller) {
@@ -141,37 +149,43 @@ export default function CinematicVideoBg({ src, className = "" }: CinematicVideo
       }
 
       if (scrollTriggerInstance) {
-        scrollTriggerInstance.kill();
+        return;
       }
 
       scrollTriggerInstance = ScrollTrigger.create({
         scroller: targetScroller,
         start: 0,
         end: "max",
-        scrub: true,
         onUpdate: (self) => {
-          const targetTime = self.progress * duration;
-          performSeek(targetTime);
-        }
+          // Read duration live: it's NaN/undefined until metadata loads
+          const duration = video.duration;
+          if (!duration || !isFinite(duration)) return;
+
+          gsap.to(timeProxy, {
+            time: self.progress * duration,
+            duration: 0.5,
+            ease: "power2.out",
+            overwrite: true,
+            onUpdate: () => performSeek(timeProxy.time),
+          });
+        },
       });
     };
 
-    const handleMetadata = () => {
-      initScrollTrigger();
-    };
+    // Recalculate scroll range once media/layout settles (images, video, fonts)
+    const refreshTriggers = () => ScrollTrigger.refresh();
+    const handleMetadata = () => refreshTriggers();
 
-    if (video.readyState >= 1) {
-      handleMetadata();
-    } else {
-      video.addEventListener("loadedmetadata", handleMetadata);
-    }
+    video.addEventListener("loadedmetadata", handleMetadata);
+    window.addEventListener("load", refreshTriggers);
 
-    // Initialize checking process immediately
     initScrollTrigger();
 
     return () => {
       video.removeEventListener("seeked", handleSeeked);
       video.removeEventListener("loadedmetadata", handleMetadata);
+      window.removeEventListener("load", refreshTriggers);
+      gsap.killTweensOf(timeProxy);
       if (fallbackTimeout) {
         clearTimeout(fallbackTimeout);
       }

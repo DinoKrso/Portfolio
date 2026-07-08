@@ -140,6 +140,13 @@ const EXPERIENCE_ITEMS: ExperienceItem[] = [
     imageUrl: "/aida.png",
     link: "https://www.aidahalimic.ba/",
   },
+  {
+    id: "exp-11",
+    title: "Resident App for Building Complexes",
+    subtitle: "ResideIn",
+    imageUrl: "/residein.png",
+    link: "https://www.reside-in.com/",
+  },
 ];
 
 // Tech stack items with custom float configurations
@@ -302,8 +309,8 @@ export default function App() {
         id="main-scroll-container"
         className="h-full w-full overflow-y-auto overflow-x-hidden relative z-10 flex flex-col scroll-smooth pb-[max(1.5rem,env(safe-area-inset-bottom))] md:pb-0"
         style={{
-          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
-          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%)',
+          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 82%, rgba(0,0,0,0) 100%)',
         }}
       >
         {/* Hero section at 100vh with Inset Feel */}
@@ -423,7 +430,7 @@ export default function App() {
                   onMouseLeave: () => !isMobile && setHoveredExpIndex(null),
                   initial: { y: 35, opacity: 0 },
                   whileInView: { y: 0, opacity: 1 },
-                  viewport: { once: true, margin: "-50px" },
+                  viewport: { once: true, amount: 0.15 },
                   transition: { delay: (idx % 3) * 0.08, duration: 0.6, ease: [0.16, 1, 0.3, 1] as const },
                   className: `group relative overflow-hidden rounded-2xl bg-neutral-950 border border-neutral-800/60 p-4 sm:p-5 flex flex-col justify-between transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer select-none no-underline text-inherit ${cardFlexClass}`,
                 };
@@ -543,26 +550,25 @@ export default function App() {
               <motion.div
                 key={tech.name}
                 initial={{ opacity: 0, scale: 0.8, y: 30 }}
-                whileInView={{
-                  opacity: 1,
-                  scale: 1,
-                  y: 0,
-                }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ delay: idx * 0.05, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full md:w-auto"
+              >
+              <motion.div
                 animate={isMobile ? undefined : { y: [0, -10, 0] }}
-                viewport={{ once: true }}
-                transition={{
-                  y: isMobile
+                transition={
+                  isMobile
                     ? undefined
                     : {
-                        delay: tech.floatDelay,
-                        duration: tech.floatDuration,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      },
-                  opacity: { delay: idx * 0.05, duration: 0.5 },
-                  scale: { delay: idx * 0.05, duration: 0.5 },
-                  hasOnView: { duration: 0.5 },
-                }}
+                        y: {
+                          delay: tech.floatDelay,
+                          duration: tech.floatDuration,
+                          repeat: Infinity,
+                          ease: "easeInOut",
+                        },
+                      }
+                }
                 whileHover={
                   isMobile
                     ? undefined
@@ -600,6 +606,7 @@ export default function App() {
                     {tech.name}
                   </span>
                 </div>
+              </motion.div>
               </motion.div>
             );
           })}
