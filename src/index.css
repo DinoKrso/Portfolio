@@ -6,14 +6,28 @@
   --font-instrument: 'Instrument Serif', serif;
 }
 
-@keyframes loadingSlide {
-  0% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+/* Infinite marquee ticker: track holds two identical strips, loops at -50% */
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
-.animate-loading-line {
-  animation: loadingSlide 2s infinite ease-in-out;
+.marquee-track {
+  animation: marqueeScroll 30s linear infinite;
+}
+
+.marquee-reverse {
+  animation-direction: reverse;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
 }
 
 /* Custom visual styles for premium lighting and glow details */
