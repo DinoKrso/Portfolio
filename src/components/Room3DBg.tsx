@@ -110,14 +110,75 @@ function buildRoom(scene: THREE.Scene) {
     room.add(box(0.09, 1.0, 0.09, darkWoodMat, lx, 0.5, lz));
   });
 
-  // Monitor: stand, bezel and a glowing screen
+  // Monitor: stand, bezel and a code-editor screen
   room.add(box(0.5, 0.05, 0.3, deviceMat, 0, 1.13, -2.0));
   room.add(box(0.08, 0.35, 0.08, deviceMat, 0, 1.3, -2.0));
   room.add(box(1.7, 1.05, 0.07, deviceMat, 0, 1.85, -2.05));
+
+  // Fake syntax-highlighted code drawn onto a canvas texture, so the screen
+  // reads as a dark editor instead of a bright light source washing the page
+  const TOK = {
+    kw: "#c792ea",
+    fn: "#82aaff",
+    str: "#c3e88d",
+    num: "#f78c6c",
+    type: "#ffcb6b",
+    plain: "#a6accd",
+    comment: "#546e7a",
+  };
+  const CODE_LINES: Array<Array<[string, string]>> = [
+    [["// portfolio.ts", TOK.comment]],
+    [["import ", TOK.kw], ["{ scroll } ", TOK.plain], ["from ", TOK.kw], ["'gsap'", TOK.str], [";", TOK.plain]],
+    [],
+    [["const ", TOK.kw], ["dino", TOK.plain], [": ", TOK.plain], ["Developer ", TOK.type], ["= {", TOK.plain]],
+    [["  stack: [", TOK.plain], ["'react'", TOK.str], [", ", TOK.plain], ["'node'", TOK.str], ["],", TOK.plain]],
+    [["  coffee: ", TOK.plain], ["Infinity", TOK.num], [",", TOK.plain]],
+    [["  ships: ", TOK.plain], ["true", TOK.kw], [",", TOK.plain]],
+    [["};", TOK.plain]],
+    [],
+    [["async function ", TOK.kw], ["build", TOK.fn], ["() {", TOK.plain]],
+    [["  const ", TOK.kw], ["idea ", TOK.plain], ["= ", TOK.plain], ["await ", TOK.kw], ["dream", TOK.fn], ["();", TOK.plain]],
+    [["  return ", TOK.kw], ["ship", TOK.fn], ["(idea);", TOK.plain]],
+    [["}", TOK.plain]],
+  ];
+
+  const codeCanvas = document.createElement("canvas");
+  codeCanvas.width = 512;
+  codeCanvas.height = 300;
+  const codeCtx = codeCanvas.getContext("2d")!;
+
+  const drawCode = (cursorVisible: boolean) => {
+    codeCtx.fillStyle = "#10141a";
+    codeCtx.fillRect(0, 0, 512, 300);
+    // Editor gutter
+    codeCtx.fillStyle = "#0c0f14";
+    codeCtx.fillRect(0, 0, 42, 300);
+    codeCtx.font = "15px monospace";
+    CODE_LINES.forEach((segments, i) => {
+      const y = 28 + i * 21;
+      codeCtx.fillStyle = "#3a4452";
+      codeCtx.fillText(String(i + 1), 12, y);
+      let x = 54;
+      segments.forEach(([text, color]) => {
+        codeCtx.fillStyle = color;
+        codeCtx.fillText(text, x, y);
+        x += codeCtx.measureText(text).width;
+      });
+    });
+    if (cursorVisible) {
+      codeCtx.fillStyle = "#E1E0CC";
+      codeCtx.fillRect(54 + codeCtx.measureText("}").width + 2, 28 + 12 * 21 - 13, 8, 16);
+    }
+  };
+  drawCode(true);
+
+  const codeTexture = new THREE.CanvasTexture(codeCanvas);
+  codeTexture.colorSpace = THREE.SRGBColorSpace;
   const screenMat = new THREE.MeshStandardMaterial({
-    color: 0x9db8cc,
-    emissive: 0x87b0d6,
-    emissiveIntensity: 1.15,
+    color: 0x000000,
+    emissive: 0xffffff,
+    emissiveMap: codeTexture,
+    emissiveIntensity: 0.9,
     roughness: 1,
   });
   const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.55, 0.9), screenMat);
@@ -219,7 +280,7 @@ function buildRoom(scene: THREE.Scene) {
   room.add(box(0.35, 0.08, 0.26, matte(0x445138), -3.62, 0.71, -1.88));
 
   scene.add(room);
-  return { screenMat };
+  return { screenMat, drawCode, codeTexture };
 }
 
 export default function Room3DBg() {
@@ -269,14 +330,14 @@ export default function Room3DBg() {
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     mount.appendChild(renderer.domElement);
 
-    const { screenMat } = buildRoom(scene);
+    const { screenMat, drawCode, codeTexture } = buildRoom(scene);
 
     // Lighting: dim warm ambience, warm desk lamp, cool monitor + window light
     scene.add(new THREE.HemisphereLight(0x3a3226, 0x0c0a08, 0.55));
     const lampLight = new THREE.PointLight(0xffc987, 14, 9, 2);
     lampLight.position.set(-1.6, 1.7, -1.8);
     scene.add(lampLight);
-    const screenLight = new THREE.PointLight(0x87b0d6, 7, 6, 2);
+    const screenLight = new THREE.PointLight(0x87b0d6, 2.5, 6, 2);
     screenLight.position.set(0, 1.8, -1.5);
     scene.add(screenLight);
     const windowLight = new THREE.PointLight(0x4a6c8c, 6, 8, 2);
@@ -308,7 +369,7 @@ export default function Room3DBg() {
     // Mutable proxies tweened by the timeline; applied to the camera every frame.
     const camPos = { x: 5.4, y: 3.0, z: 6.8 };
     const look = { x: -0.4, y: 1.3, z: -1.2 };
-    const fx = { screenGlow: 1.15 };
+    const fx = { screenGlow: 0.9 };
 
     const tl = gsap.timeline({ paused: true, defaults: { ease: "none" } });
     // Act 2 (manifesto): dolly in toward the desk
@@ -323,7 +384,7 @@ export default function Room3DBg() {
       // Act 5 (contact): push in on the glowing monitor
       .to(camPos, { x: -0.1, y: 1.5, z: 0.6, duration: 1 }, 3)
       .to(look, { x: 0, y: 1.6, z: -2.0, duration: 1 }, 3)
-      .to(fx, { screenGlow: 2.4, duration: 1 }, 3);
+      .to(fx, { screenGlow: 1.35, duration: 1 }, 3);
 
     let scrollTriggerInstance: ScrollTrigger | null = null;
     let initTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -355,6 +416,7 @@ export default function Room3DBg() {
 
     const clock = new THREE.Clock();
     let rafId = 0;
+    let cursorVisible = true;
     const animate = () => {
       rafId = requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
@@ -363,8 +425,14 @@ export default function Room3DBg() {
       camera.position.set(camPos.x + mouseOffset.x, camPos.y + bob + mouseOffset.y, camPos.z);
       camera.lookAt(look.x, look.y, look.z);
 
-      // Subtle monitor flicker so the room feels alive
-      screenMat.emissiveIntensity = fx.screenGlow + Math.sin(t * 2.7) * 0.06;
+      // Blinking cursor on the code screen + a barely-there flicker
+      const blink = Math.floor(t * 1.6) % 2 === 0;
+      if (blink !== cursorVisible) {
+        cursorVisible = blink;
+        drawCode(cursorVisible);
+        codeTexture.needsUpdate = true;
+      }
+      screenMat.emissiveIntensity = fx.screenGlow + Math.sin(t * 2.7) * 0.03;
       dust.rotation.y = t * 0.008;
 
       renderer.render(scene, camera);
@@ -393,6 +461,7 @@ export default function Room3DBg() {
           mats.forEach((m) => m.dispose());
         }
       });
+      codeTexture.dispose();
       renderer.dispose();
       mount.removeChild(renderer.domElement);
     };
