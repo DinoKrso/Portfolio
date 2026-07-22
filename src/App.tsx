@@ -400,8 +400,11 @@ export default function App() {
         );
       }
 
-      // Act 3 — experience: vertical scroll drives the gallery sideways
-      if (galleryWrapRef.current && galleryTrackRef.current) {
+      // Act 3 — experience: vertical scroll drives the gallery sideways.
+      // Mobile skips this entirely — the pinned 400vh + sticky + scrub combo is
+      // fragile on mobile browsers (address-bar resize, touch-scroll conflicts),
+      // so mobile gets a plain native horizontal-swipe gallery instead (see JSX).
+      if (galleryWrapRef.current && galleryTrackRef.current && !isMobile) {
         const track = galleryTrackRef.current;
         gsap.to(track, {
           x: () => -(track.scrollWidth - scroller.clientWidth + 48),
@@ -676,13 +679,18 @@ export default function App() {
           </div>
         </section>
 
-        {/* ═══ ACT 3 — EXPERIENCE: vertical scroll drives a horizontal project gallery ═══ */}
+        {/* ═══ ACT 3 — EXPERIENCE: vertical scroll drives a horizontal project gallery on desktop;
+             mobile gets a plain native horizontal-swipe row (pinned-scrub is fragile on mobile) ═══ */}
         <section
           id="experience-section"
           ref={galleryWrapRef}
-          className="relative h-[400vh] w-full flex-shrink-0 z-10"
+          className={`relative w-full flex-shrink-0 z-10 ${isMobile ? "" : "h-[400vh]"}`}
         >
-          <div className="sticky top-0 h-[100dvh] md:h-screen w-full flex flex-col justify-center overflow-hidden">
+          <div
+            className={`w-full flex flex-col justify-center ${
+              isMobile ? "py-14" : "sticky top-0 h-[100dvh] md:h-screen overflow-hidden"
+            }`}
+          >
             <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-16 mb-8 md:mb-12">
               <SectionLabel>02 // SELECTED WORK</SectionLabel>
               <SplitHeading
@@ -698,10 +706,14 @@ export default function App() {
               />
             </div>
 
-            {/* Horizontal track — GSAP translates it left as the section scrolls */}
+            {/* Horizontal track — GSAP translates it on desktop; native swipe-scroll on mobile */}
             <div
               ref={galleryTrackRef}
-              className="flex items-stretch gap-4 md:gap-6 pl-4 sm:pl-8 md:pl-16 w-max will-change-transform"
+              className={`flex items-stretch gap-4 md:gap-6 pl-4 sm:pl-8 md:pl-16 ${
+                isMobile
+                  ? "w-full overflow-x-auto pr-4 pb-2 snap-x snap-proximity [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  : "w-max will-change-transform"
+              }`}
             >
               {EXPERIENCE_ITEMS.map((item, idx) => {
                 const CardTag = item.link ? "a" : "div";
@@ -711,7 +723,9 @@ export default function App() {
                     {...(item.link
                       ? { href: item.link, target: "_blank", rel: "noopener noreferrer" }
                       : {})}
-                    className="group relative overflow-hidden rounded-2xl md:rounded-3xl bg-neutral-950 border border-neutral-800/60 w-[76vw] sm:w-[400px] md:w-[460px] h-[52vh] md:h-[56vh] shrink-0 flex flex-col justify-between p-4 sm:p-6 cursor-pointer select-none no-underline text-inherit transition-colors duration-500 hover:border-neutral-600/80"
+                    className={`group relative overflow-hidden rounded-2xl md:rounded-3xl bg-neutral-950 border border-neutral-800/60 w-[76vw] sm:w-[400px] md:w-[460px] h-[52vh] md:h-[56vh] shrink-0 flex flex-col justify-between p-4 sm:p-6 cursor-pointer select-none no-underline text-inherit transition-colors duration-500 hover:border-neutral-600/80 ${
+                      isMobile ? "snap-center" : ""
+                    }`}
                   >
                     {/* Absolute Image Background */}
                     <div className="absolute inset-0 overflow-hidden z-0">
@@ -763,7 +777,11 @@ export default function App() {
               })}
 
               {/* Gallery end card — invitation to connect */}
-              <div className="relative rounded-2xl md:rounded-3xl border border-dashed border-neutral-800 w-[60vw] sm:w-[320px] shrink-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
+              <div
+                className={`relative rounded-2xl md:rounded-3xl border border-dashed border-neutral-800 w-[60vw] sm:w-[320px] shrink-0 flex flex-col items-center justify-center gap-4 p-6 text-center ${
+                  isMobile ? "snap-center" : ""
+                }`}
+              >
                 <span className="font-mono text-[10px] tracking-widest text-neutral-500 uppercase">
                   Your project here?
                 </span>
@@ -780,7 +798,7 @@ export default function App() {
             {/* Drag hint */}
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-16 mt-8 md:mt-10 flex items-center gap-3">
               <span className="font-mono text-[9px] tracking-[0.4em] uppercase text-neutral-600">
-                Keep scrolling
+                {isMobile ? "Swipe to explore" : "Keep scrolling"}
               </span>
               <ArrowRight size={10} className="text-neutral-600" />
             </div>
