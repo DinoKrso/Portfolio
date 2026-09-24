@@ -170,6 +170,13 @@ const EXPERIENCE_ITEMS: ExperienceItem[] = [
     imageUrl: "/residein.png",
     link: "https://www.reside-in.com/",
   },
+  {
+    id: "exp-12",
+    title: "Full-Stack App + Web App",
+    subtitle: "MySkin Code",
+    imageUrl: "/myskincode.png",
+    link: "https://www.myskincodeapp.com/",
+  },
 ];
 
 // Tech stack items with custom float configurations

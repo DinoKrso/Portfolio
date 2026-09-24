@@ -6,6 +6,32 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "miru",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["/Users/dinokrso/Desktop/Projekti/miru/server.js"],
+      "port": 3111
+    },
+    {
+      "name": "bihvision",
+      "runtimeExecutable": "/Users/dinokrso/Desktop/Projekti/BiHVision/.venv/bin/python",
+      "runtimeArgs": ["-m", "bihvision.main"],
+      "port": 8000
+    },
+    {
+      "name": "tourdesk",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "/Users/dinokrso/Desktop/Projekti/TourDesk",
+        "run",
+        "dev",
+        "--",
+        "--port",
+        "3200"
+      ],
+      "port": 3200
     }
   ]
 }
