@@ -177,6 +177,13 @@ const EXPERIENCE_ITEMS: ExperienceItem[] = [
     imageUrl: "/myskincode.png",
     link: "https://www.myskincodeapp.com/",
   },
+  {
+    id: "exp-13",
+    title: "Web App",
+    subtitle: "Ali Marketi",
+    imageUrl: "/AliMarketi.png",
+    link: "https://www.alimarketi.ba/",
+  },
 ];
 
 // Tech stack items with custom float configurations
