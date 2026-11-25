@@ -184,6 +184,13 @@ const EXPERIENCE_ITEMS: ExperienceItem[] = [
     imageUrl: "/AliMarketi.png",
     link: "https://www.alimarketi.ba/",
   },
+  {
+    id: "exp-14",
+    title: "Web App",
+    subtitle: "Mod Light Group",
+    imageUrl: "/mlgroup.png",
+    link: "https://www.mlgroup.ba/",
+  },
 ];
 
 // Tech stack items with custom float configurations
